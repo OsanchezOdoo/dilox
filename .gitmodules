@@ -7,3 +7,8 @@
 	path = OsanchezOdoo-dilox
 	url = git@github.com:OsanchezOdoo/dilox.git
 	branch = addenda-extra
+
+[submodule "addenda-extra"]
+	path = addenda-extra
+	url = git@github.com:OsanchezOdoo/dilox.git
+	branch = Facturación
