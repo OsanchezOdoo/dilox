@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <template id="Addenda_Modelo" name="Extra">
+            <modelo:AddendaModelo xmlns:modelo="http://www.gmodelo.com.mx/CFD/Addenda/Receptor">
+                <modelo:requestForPayment type="SimpleInvoiceType" contentVersion="1.3.1" documentStructureVersion="AMC7.1" documentStatus="ORIGINAL">
+                    <modelo:requestForPaymentIdentification>
+                        <modelo:entityType><t t-esc="record.entityType"/></modelo:entityType>
+                        <modelo:uniqueCreatorIdentification><t t-esc="record.name"/></modelo:uniqueCreatorIdentification>
+                    </modelo:requestForPaymentIdentification>
+                    <modelo:specialInstruction t-att-code="record.specialInstructioncode">
+                        <modelo:text><t t-esc="record.specialInstruction"/></modelo:text>
+                    </modelo:specialInstruction>
+                    <modelo:orderIdentification>
+                        <modelo:referenceIdentification type="ON"><t t-esc="record.referenceIdentification"/></modelo:referenceIdentification>
+                        <ReferenceDate t-field="record.invoice_date" t-options='{"format": "yyyy-MM-dd"}' />
+                    </modelo:orderIdentification>
+                    <modelo:buyer>
+                        <modelo:gln><t t-esc="record.company_id.buyer_gln"/></modelo:gln>
+                        <modelo:contactInformation>
+                            <modelo:personOrDepartmentName>
+                                <modelo:text><t t-esc="record.company_id.buyer_personOrDepartmentName_text"/></modelo:text>
+                            </modelo:personOrDepartmentName>
+                        </modelo:contactInformation>
+                    </modelo:buyer>
+                    <modelo:seller>
+                        <modelo:gln><t t-esc="record.partner_shipping_id.shipping_gln"/></modelo:gln>
+                        <modelo:alternatePartyIdentification type="SELLER_ASSIGNED_IDENTIFIER_FOR_A_PARTY"><t t-esc="record.partner_shipping_id.shipping_number_provider"/></modelo:alternatePartyIdentification>
+                    </modelo:seller>
+                    <modelo:shipTo>
+                        <modelo:gln><t t-esc="record.company_id.buyer_gln"/></modelo:gln>
+                        -
+                        <modelo:nameAndAddress>
+                            <modelo:name><t t-esc="record.partner_shipping_id.name"/></modelo:name>
+                            <modelo:streetAddressOne><t t-esc="record.partner_shipping_id.street"/></modelo:streetAddressOne>
+                            <modelo:city><t t-esc="record.partner_shipping_id.city"/></modelo:city>
+                            <modelo:postalCode><t t-esc="record.partner_shipping_id.zip"/></modelo:postalCode>
+                        </modelo:nameAndAddress>
+                    </modelo:shipTo>
+                    <modelo:InvoiceCreator>
+                        <modelo:gln><t t-esc="record.partner_shipping_id.shipping_gln"/></modelo:gln>
+                        <modelo:alternatePartyIdentification t-att-type="record.alternatePartyIdentification"><t t-esc="record.partner_shipping_id.shipping_number_provider"/></modelo:alternatePartyIdentification>
+                        <modelo:nameAndAddress>
+                            <modelo:name><t t-esc="record.company_id.name"/></modelo:name>
+                            <modelo:streetAddressOne><t t-esc="record.company_id.street"/></modelo:streetAddressOne>
+                            <modelo:city><t t-esc="record.company_id.city"/></modelo:city>
+                            <modelo:postalCode><t t-esc="record.company_id.zip"/></modelo:postalCode>
+                        </modelo:nameAndAddress>
+                    </modelo:InvoiceCreator>
+                    <modelo:currency t-att-currencyISOCode="record.currency_id.name">
+                        <modelo:currencyFunction>BILLING_CURRENCY</modelo:currencyFunction>
+                        <modelo:rateOfChange><t t-esc="record.currency_id.rate" /></modelo:rateOfChange>
+                    </modelo:currency>
+                    <modelo:paymentTerms paymentTermsEvent="DATE_OF_INVOICE" PaymentTermsRelationTime="REFERENCE_AFTER">
+                        <modelo:netPayment netPaymentTermsType="BASIC_NET">
+                            <modelo:paymentTimePeriod>
+                                <modelo:timePeriodDue timePeriod="DAYS">
+                                    <modelo:value><t t-esc="record.invoice_payment_term_id.term_day" /></modelo:value>
+                                </modelo:timePeriodDue>
+                            </modelo:paymentTimePeriod>
+                        </modelo:netPayment>
+                    </modelo:paymentTerms>
+                    <t t-set="count" t-value="10"/>
+                    <t t-set="amountiva16" t-value="0"/>
+                    <t t-set="amountiva0" t-value="0"/>
+                    <t t-set="amountieps" t-value="0"/>
+                    <t t-set="taxPercentageieps" t-value="0"/>
+                    <t t-set="taxAmount" t-value="0"/>
+                    <t t-foreach="record.invoice_line_ids" t-as="lines">
+                        <modelo:lineItem type="SimpleInvoiceLineItemType" t-att-orderLineNumber="count">
+                            <modelo:tradeItemIdentification>
+                                <modelo:gtin><t t-esc="lines.product_id.barcode"/></modelo:gtin>
+                            </modelo:tradeItemIdentification>
+                            <modelo:tradeItemDescriptionInformation language="ES">
+                                <modelo:longText><t t-esc="lines.name"/></modelo:longText>
+                            </modelo:tradeItemDescriptionInformation>
+                            <modelo:invoicedQuantity t-att-unitOfMeasure="lines.product_uom_id.name"><t t-esc="lines.quantity"/></modelo:invoicedQuantity>
+                            <modelo:aditionalQuantity QuantityType="NUM_CONSUMER_UNITS">1</modelo:aditionalQuantity>
+                            <modelo:grossPrice>
+                                <modelo:Amount><t t-esc="lines.price_subtotal / lines.quantity"/></modelo:Amount>
+                            </modelo:grossPrice>
+                            <modelo:netPrice>
+                                <modelo:Amount><t t-esc="lines.price_total / lines.quantity"/></modelo:Amount>
+                            </modelo:netPrice>
+                            <modelo:AdditionalInformation>
+                                <modelo:referenceIdentification type="DQ"><t t-esc="record.invoice_origin"/></modelo:referenceIdentification>
+                            </modelo:AdditionalInformation>
+                            <t t-foreach="lines.tax_ids" t-as="tac">
+                                <t t-set="resultoper" t-value="(lines.quantity * lines.price_unit)*(tac.amount / 100)"/>
+                                <tradeItemTaxInformation>
+                                    <taxTypeDescription>VAT</taxTypeDescription>
+                                    <tradeItemTaxAmount>
+                                        <taxPercentage t-esc="'%.2f'% tac.amount"/>
+                                        <taxAmount t-esc="'%.2f'% resultoper"/>
+                                    </tradeItemTaxAmount>
+                                </tradeItemTaxInformation>
+                                <t t-if="tac.amount == 16">                                    
+                                    <t t-set="amountiva16" t-value="amountiva16 + resultoper"/>
+                                </t>
+                                <t t-if="tac.amount == 0">                                    
+                                    <t t-set="amountiva0" t-value="1"/>
+                                </t>
+                                <t t-if="tac.description[0:3] == 'IEPS'">
+                                    <t t-set="amountieps" t-value="1"/>
+                                    <t t-set="taxPercentageieps" t-value="tac.amount"/>
+                                    <t t-set="taxAmount" t-value="(lines.quantity * lines.price_unit)* tac.amount"/>
+                                </t>
+                            </t>
+                            <modelo:totalLineAmount>
+                                <modelo:grossAmount>
+                                    <modelo:Amount><t t-esc="lines.price_subtotal"/></modelo:Amount>
+                                </modelo:grossAmount>
+                                <modelo:netAmount>
+                                    <modelo:Amount><t t-esc="lines.price_total"/></modelo:Amount>
+                                </modelo:netAmount>
+                            </modelo:totalLineAmount>
+                        </modelo:lineItem>
+                        <t t-set="count" t-value="count + 10"/>
+                    </t>
+                    <modelo:totalAmount>
+                        <modelo:Amount><t t-esc="'%.2f'% record.amount_total_signed"/></modelo:Amount>
+                    </modelo:totalAmount>
+                    <modelo:baseAmount>
+                        <modelo:Amount><t t-esc="'%.2f'% record.amount_untaxed"/></modelo:Amount>
+                    </modelo:baseAmount>
+                    <t t-if="amountiva16 > 0">
+                        <modelo:tax type="VAT">
+                            <modelo:taxPercentage>16</modelo:taxPercentage>
+                            <modelo:taxAmount><t t-esc="'%.2f'% amountiva16"/></modelo:taxAmount>
+                            <modelo:taxCategory>TRANSFERIDO</modelo:taxCategory>
+                        </modelo:tax>
+                    </t>
+                    <t t-if="amountiva0 == 1">
+                        <modelo:tax type="VAT">
+                            <modelo:taxPercentage>0.0</modelo:taxPercentage>
+                            <modelo:taxAmount>0.0</modelo:taxAmount>
+                            <modelo:taxCategory>TRANSFERIDO</modelo:taxCategory>
+                        </modelo:tax>
+                    </t>
+                    <t t-if="amountieps == 1">
+                        <modelo:tax type="VAT">
+                            <modelo:taxPercentage><t t-esc="'%.2f'% taxPercentageieps"/></modelo:taxPercentage>
+                            <modelo:taxAmount><t t-esc="'%.2f'% taxAmount"/></modelo:taxAmount>
+                            <modelo:taxCategory>TRANSFERIDO</modelo:taxCategory>
+                        </modelo:tax>
+                    </t>
+                    <modelo:payableAmount>
+                        <modelo:Amount><t t-esc="'%.2f'% record.amount_total_signed"/></modelo:Amount>
+                    </modelo:payableAmount>
+                </modelo:requestForPayment>
+            </modelo:AddendaModelo>
+        </template>
+        <record id="Addenda_Modelo" model="ir.ui.view">
+            <field name="l10n_mx_edi_addenda_flag">True</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_addenda_extra_odoo_addenda_extra_odoo,addenda_extra_odoo.addenda_extra_odoo,model_addenda_extra_odoo_addenda_extra_odoo,base.group_user,1,1,1,1
