@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+   <record id="view_res_partner_addenda_extra" model="ir.ui.view">
+      <field name="name">res.partner.form.addenda.extra</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="l10n_mx_edi.l10n_mx_edi_inh_res_partner_form" />
+      <field name="arch" type="xml">
+         <xpath expr="//field[@name='child_ids']/form/sheet/group[2]//field[@name='comment']" position="after">
+            <group>
+              <field name="oxxo_gln"/>
+            </group>
+           </xpath>
+      </field>
+   </record>   
+</odoo>

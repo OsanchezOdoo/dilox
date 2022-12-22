@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <template id="Addenda_oxxo" name="OXXO">
+            <oxxo:AddendaOXXO xmlns:oxxo="http://www.buzonfiscal.com/schema/xsd/oxxo" 
+            noVersAdd="1" 
+            t-att-claseDoc="record.claseDoc if record.claseDoc else ''" 
+            t-att-plaza="record.plaza if record.plaza else ''" 
+            t-att-tipoProv="record.tipoProv if record.tipoProv else ''" 
+            t-att-locType="record.locType if record.locType else ''" 
+            t-att-folioPago="record.folioPago if record.folioPago else ''" 
+            t-att-ordCompra="record.ordCompra if record.ordCompra else ''" 
+            t-att-glnEmisor="record.company_id.oxxo_gln" 
+            t-att-glnReceptor="record.partner_shipping_id.oxxo_gln" 
+            t-att-moneda="record.currency_id.name" 
+            t-att-tipoCambio="'%.6f'% record.currency_id.rate" 
+            t-att-importeTotal="'%.2f'% record.amount_total_signed" 
+            t-att-tipoValidacion="record.tipoValidacion if record.tipoValidacion else ''" t-att-fuenteNota="record.fuenteNota if record.fuenteNota else ''">
+                <oxxo:Articulos>
+                    <t t-set="date" t-value="record.invoice_date" t-options='{"format": "yyyy-MM-dd"}'/>
+                    <t t-foreach="record.invoice_line_ids" t-as="lines">
+                        <t t-set="montoIva" t-value="0"/>
+                        <t t-foreach="lines.tax_ids" t-as="tac">
+                            <t t-if="tac.amount == 16">
+                                <t t-set="montoIva" t-value="(lines.quantity * lines.price_unit)*(tac.amount / 100)"/>                       
+                            </t>
+                        </t>
+                        <oxxo:Detalle 
+                            t-att-pedidoAdicional="lines.pedidoAdicional if lines.pedidoAdicional else ''" 
+                            t-att-remision="lines.remision if lines.remision else ''" 
+                            t-att-fechaEntrega="date" 
+                            t-att-crTienda="lines.crTienda if lines.crTienda else ''" 
+                            t-att-nombreTienda="lines.nombreTiend if lines.nombreTienda else ''" 
+                            t-att-numProducto="lines.product_id.barcode if lines.product_id.barcode else ''" 
+                            t-att-descripcion="lines.product_id.name if lines.product_id.name else ''" 
+                            t-att-unidadMedida="lines.product_uom_id.name if lines.product_uom_id.name else ''" 
+                            t-att-cantidad="lines.quantity" 
+                            t-att-porcIva="16.00 if montoIva > 0 else '%.2f'% 0.00" 
+                            t-att-montoIva="'%.2f'% montoIva if montoIva > 0 else '%.2f'% 0.00" 
+                            porcIeps1="0.00" 
+                            montoIeps1="0.00" 
+                            t-att-ImporteNeto="lines.price_total"/>
+                    </t>
+                </oxxo:Articulos>
+            </oxxo:AddendaOXXO>
+        </template>
+        <record id="Addenda_oxxo" model="ir.ui.view">
+            <field name="l10n_mx_edi_addenda_flag">True</field>
+        </record>
+    </data>
+</odoo>
