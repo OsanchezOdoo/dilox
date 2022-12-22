@@ -2,3 +2,8 @@
 	path = OsanchezOdoo/dilox
 	url = git@github.com:OsanchezOdoo/dilox.git
 	branch = addenda_oxxo
+
+[submodule "OsanchezOdoo-dilox"]
+	path = OsanchezOdoo-dilox
+	url = git@github.com:OsanchezOdoo/dilox.git
+	branch = addenda-extra
